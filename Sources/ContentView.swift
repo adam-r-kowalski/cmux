@@ -1999,6 +1999,15 @@ struct ContentView: View {
         )
     }
 
+    private var titlebarPaneActions: some View {
+        TitlebarPaneActionControlsView(
+            onNewTerminal: { tabManager.newSurface() },
+            onNewBrowser: { _ = AppDelegate.shared?.openBrowserAndFocusAddressBar(insertAtEnd: true) },
+            onSplitRight: { tabManager.createSplit(direction: .right) },
+            onSplitDown: { tabManager.createSplit(direction: .down) }
+        )
+    }
+
     private var customTitlebar: some View {
         ZStack {
             // Enable window dragging from the titlebar strip without making the entire content
@@ -2026,6 +2035,9 @@ struct ContentView: View {
 
                 Spacer()
 
+                if sidebarSelectionState.selection == .tabs, tabManager.selectedWorkspace != nil {
+                    titlebarPaneActions
+                }
             }
             .frame(height: 28)
             .padding(.top, 2)

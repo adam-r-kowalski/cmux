@@ -1135,7 +1135,20 @@ final class Workspace: Identifiable, ObservableObject {
             autoCloseEmptyPanes: true,
             contentViewLifecycle: .keepAllAlive,
             newTabPosition: .current,
-            appearance: appearance
+            appearance: BonsplitConfiguration.Appearance(
+                tabBarHeight: appearance.tabBarHeight,
+                tabMinWidth: appearance.tabMinWidth,
+                tabMaxWidth: appearance.tabMaxWidth,
+                tabSpacing: appearance.tabSpacing,
+                minimumPaneWidth: appearance.minimumPaneWidth,
+                minimumPaneHeight: appearance.minimumPaneHeight,
+                showSplitButtons: false,
+                showSingleTabBar: false,
+                splitButtonTooltips: appearance.splitButtonTooltips,
+                animationDuration: appearance.animationDuration,
+                enableAnimations: appearance.enableAnimations,
+                chromeColors: appearance.chromeColors
+            )
         )
         self.bonsplitController = BonsplitController(configuration: config)
         bonsplitController.contextMenuShortcuts = Self.buildContextMenuShortcuts()

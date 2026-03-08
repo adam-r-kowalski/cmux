@@ -502,6 +502,73 @@ struct TitlebarControlsView: View {
     }
 }
 
+struct TitlebarPaneActionControlsView: View {
+    let onNewTerminal: () -> Void
+    let onNewBrowser: () -> Void
+    let onSplitRight: () -> Void
+    let onSplitDown: () -> Void
+
+    @AppStorage("titlebarControlsStyle") private var styleRawValue = TitlebarControlsStyle.classic.rawValue
+    @State private var shortcutRefreshTick = 0
+
+    var body: some View {
+        let _ = shortcutRefreshTick
+        let style = TitlebarControlsStyle(rawValue: styleRawValue) ?? .classic
+        let config = style.config
+
+        HStack(spacing: config.spacing) {
+            TitlebarControlButton(config: config, action: onNewTerminal) {
+                iconLabel(systemName: "terminal", config: config)
+            }
+            .accessibilityIdentifier("titlebarPaneAction.newTerminal")
+            .accessibilityLabel(String(localized: "workspace.tooltip.newTerminal", defaultValue: "New Terminal"))
+            .safeHelp(KeyboardShortcutSettings.Action.newSurface.tooltip(String(localized: "workspace.tooltip.newTerminal", defaultValue: "New Terminal")))
+
+            TitlebarControlButton(config: config, action: onNewBrowser) {
+                iconLabel(systemName: "globe", config: config)
+            }
+            .accessibilityIdentifier("titlebarPaneAction.newBrowser")
+            .accessibilityLabel(String(localized: "workspace.tooltip.newBrowser", defaultValue: "New Browser"))
+            .safeHelp(KeyboardShortcutSettings.Action.openBrowser.tooltip(String(localized: "workspace.tooltip.newBrowser", defaultValue: "New Browser")))
+
+            TitlebarControlButton(config: config, action: onSplitRight) {
+                iconLabel(systemName: "square.split.2x1", config: config)
+            }
+            .accessibilityIdentifier("titlebarPaneAction.splitRight")
+            .accessibilityLabel(String(localized: "workspace.tooltip.splitRight", defaultValue: "Split Right"))
+            .safeHelp(KeyboardShortcutSettings.Action.splitRight.tooltip(String(localized: "workspace.tooltip.splitRight", defaultValue: "Split Right")))
+
+            TitlebarControlButton(config: config, action: onSplitDown) {
+                iconLabel(systemName: "square.split.1x2", config: config)
+            }
+            .accessibilityIdentifier("titlebarPaneAction.splitDown")
+            .accessibilityLabel(String(localized: "workspace.tooltip.splitDown", defaultValue: "Split Down"))
+            .safeHelp(KeyboardShortcutSettings.Action.splitDown.tooltip(String(localized: "workspace.tooltip.splitDown", defaultValue: "Split Down")))
+        }
+        .padding(.leading, 8)
+        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
+            shortcutRefreshTick &+= 1
+        }
+    }
+
+    @ViewBuilder
+    private func iconLabel(systemName: String, config: TitlebarControlsStyleConfig) -> some View {
+        let icon = Image(systemName: systemName)
+            .font(.system(size: config.iconSize, weight: .semibold))
+            .frame(width: config.buttonSize, height: config.buttonSize)
+
+        if config.buttonBackground {
+            icon
+                .background(
+                    RoundedRectangle(cornerRadius: config.buttonCornerRadius)
+                        .fill(Color(nsColor: .controlBackgroundColor).opacity(0.7))
+                )
+        } else {
+            icon
+        }
+    }
+}
+
 @MainActor
 private final class TitlebarShortcutHintModifierMonitor: ObservableObject {
     @Published private(set) var isModifierPressed = false
